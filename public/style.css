@@ -1,0 +1,332 @@
+:root {
+    --bg-main: #0d0d0d;
+    --bg-surface: #212121;
+    --bg-hover: #2f2f2f;
+    --border-color: #2f2f2f;
+    --text-white: #ececec;
+    --text-gray: #b4b4b4;
+    --text-dark-muted: #676767;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-white);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+/* Auth Authentication Overlay Screen */
+.auth-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--bg-main);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-card {
+    background: #171717;
+    border-radius: 12px;
+    padding: 32px;
+    width: 320px;
+    text-align: center;
+}
+
+.auth-card h2 { margin: 0 0 20px 0; font-size: 20px; font-weight: 500; }
+
+.auth-card .input-group { margin-bottom: 12px; }
+
+.auth-card input {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    width: 100%; padding: 12px; border-radius: 8px; color: #fff; box-sizing: border-box; outline: none;
+}
+
+.auth-submit-btn {
+    background: var(--text-white); color: #000; width: 100%; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 8px;
+}
+
+.auth-toggle { display: block; font-size: 13px; color: var(--text-gray); margin-top: 16px; cursor: pointer; }
+
+/* Grid Core Core Framework */
+.app-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Thin Left Rail Strip (Matches Screenshot 1, 3, 4, 5) */
+.left-icon-rail {
+    width: 60px;
+    background-color: var(--bg-main);
+    border-right: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    box-sizing: border-box;
+}
+
+.top-rail-icons, .bottom-rail-icons {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    width: 100%;
+}
+
+.rail-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-gray);
+    font-size: 20px;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+}
+
+.rail-btn:hover {
+    background-color: var(--bg-surface);
+    color: var(--text-white);
+}
+
+.avatar-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #53535f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Floating ChatGPT Popup Panel for History (Matches Screenshot 1 & 2) */
+.floating-popup {
+    position: absolute;
+    left: 70px;
+    top: 70px;
+    width: 280px;
+    background-color: #171717;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    z-index: 999;
+    padding: 8px 0;
+}
+
+.hidden { display: none !important; }
+
+.popup-header {
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-gray);
+    text-transform: uppercase;
+}
+
+.popup-list { max-height: 300px; overflow-y: auto; }
+
+.popup-item {
+    padding: 10px 16px;
+    font-size: 14px;
+    color: var(--text-white);
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.popup-item:hover { background-color: var(--bg-surface); }
+
+/* Main Stage Framework */
+.chat-viewport {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-main);
+    position: relative;
+}
+
+.chat-scroller {
+    flex: 1;
+    overflow-y: auto;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Beautiful Center Welcome Hero (Matches Screenshot 5) */
+.landing-hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding-bottom: 120px;
+}
+
+.landing-hero h1 {
+    font-size: 28px;
+    font-weight: 500;
+    margin-bottom: 24px;
+    color: #fff;
+}
+
+.shortcut-pills {
+    display: flex;
+    gap: 12px;
+}
+
+.pill-suggestion {
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 10px 18px;
+    font-size: 14px;
+    color: var(--text-gray);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pill-suggestion:hover {
+    background-color: var(--bg-surface);
+    color: #fff;
+}
+
+/* Conversational Stream Framework (Matches Screenshot 3 & 4) */
+.conversation-flow {
+    padding: 40px 20px 160px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.message-bubble {
+    max-width: 100%;
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+.user-message {
+    align-self: flex-end;
+    background-color: #2f2f2f;
+    padding: 10px 16px;
+    border-radius: 20px;
+    max-width: 70%;
+    color: #fff;
+}
+
+.assistant-message pre {
+    margin: 0;
+    background-color: transparent;
+    overflow-x: auto;
+}
+
+.assistant-message code {
+    font-family: SFNono, Consolas, Monaco, monospace;
+    font-size: 15px;
+    color: var(--text-white);
+}
+
+.action-bar-strip {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.action-icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-dark-muted);
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.action-icon-btn:hover { color: var(--text-white); }
+
+/* Centered Input Pill Container (Matches Screenshot 3, 4, 5) */
+.input-dock-zone {
+    position: absolute;
+    bottom: 0; left: 0; width: 100%;
+    background: linear-gradient(180deg, rgba(13,13,13,0) 0%, var(--bg-main) 30%);
+    padding-bottom: 20px;
+}
+
+.pill-input-container {
+    max-width: 720px;
+    margin: 0 auto;
+    background-color: var(--bg-surface);
+    border-radius: 26px;
+    padding: 8px 12px 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-sizing: border-box;
+}
+
+textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-white);
+    font-size: 16px;
+    resize: none;
+    font-family: inherit;
+    height: 24px;
+    line-height: 24px;
+}
+
+.pill-side-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-gray);
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.send-pill-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #fff;
+    color: #000;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.send-pill-btn:disabled { opacity: 0.2; }
+
+.bottom-disclaimer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-dark-muted);
+    margin-top: 8px;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: #2f2f2f; border-radius: 4px; }

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free CodeAi</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div id="authOverlay" class="auth-overlay">
+        <div class="auth-card">
+            <h2 id="authTitle">Sign in to Free CodeAi</h2>
+            <div class="input-group">
+                <input type="text" id="authUser" placeholder="Username" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <input type="password" id="authPass" placeholder="Password">
+            </div>
+            <button class="auth-submit-btn" onclick="handleAuth()">Continue</button>
+            <span onclick="toggleAuthMode()" id="authToggleText" class="auth-toggle">Create an account</span>
+        </div>
+    </div>
+
+    <div class="app-container">
+        
+        <aside class="left-icon-rail">
+            <div class="top-rail-icons">
+                <button class="rail-btn" onclick="startNewChat()" title="New Chat">
+                    <i class="fa-regular fa-pen-to-square"></i>
+                </button>
+                <button class="rail-btn" onclick="toggleSearch()" title="Search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+                <button class="rail-btn id-chat-bubble" onclick="toggleRecentsMenu(event)" title="History">
+                    <i class="fa-regular fa-comment"></i>
+                </button>
+            </div>
+            <div class="bottom-rail-icons">
+                <div class="avatar-dot" id="avatarLetter" onclick="logout()" title="Logout">U</div>
+            </div>
+        </aside>
+
+        <div id="recentsMenu" class="floating-popup hidden">
+            <div class="popup-header">Recents</div>
+            <div class="popup-list" id="historyList">
+                </div>
+        </div>
+
+        <main class="chat-viewport">
+            
+            <div class="chat-scroller" id="chatScroller">
+                
+                <div class="landing-hero" id="welcomeMessage">
+                    <h1>Where should we begin?</h1>
+                    <div class="shortcut-pills">
+                        <div class="pill-suggestion" onclick="fillPrompt('Create a responsive card component with HTML/CSS')">
+                            <i class="fa-regular fa-image"></i> Create component
+                        </div>
+                        <div class="pill-suggestion" onclick="fillPrompt('Write a clean JavaScript utility function to format dates')">
+                            <i class="fa-solid fa-pen"></i> Write or edit
+                        </div>
+                    </div>
+                </div>
+
+                <div id="conversationFlow" class="conversation-flow hidden">
+                    <div class="message-bubble user-message" id="userMsgDisplay"></div>
+                    
+                    <div class="message-bubble assistant-message">
+                        <pre><code id="outputDisplay"></code></pre>
+                        <div class="action-bar-strip">
+                            <button class="action-icon-btn" onclick="copyToClipboard()" title="Copy code">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="input-dock-zone">
+                <div class="pill-input-container">
+                    <button class="pill-side-btn"><i class="fa-solid fa-plus"></i></button>
+                    <textarea id="promptInput" rows="1" placeholder="Ask anything" oninput="autoGrow(this)"></textarea>
+                    <button class="pill-side-btn"><i class="fa-solid fa-microphone"></i></button>
+                    <button id="generateBtn" class="send-pill-btn" onclick="generateCode()">
+                        <i class="fa-solid fa-arrow-up"></i>
+                    </button>
+                </div>
+                <div class="bottom-disclaimer">Free CodeAi can make mistakes. Check important info.</div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        let currentUser = localStorage.getItem('username') || null;
+        let isRegisterMode = false;
+
+        if (currentUser) {
+            document.getElementById('authOverlay').style.display = 'none';
+            document.getElementById('avatarLetter').textContent = currentUser.charAt(0).toUpperCase();
+            loadHistory();
+        }
+
+        function autoGrow(element) {
+            element.style.height = "auto";
+            element.style.height = (element.scrollHeight > 200 ? 200 : element.scrollHeight) + "px";
+        }
+
+        function toggleAuthMode() {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('authTitle').textContent = isRegisterMode ? "Create Account" : "Sign in to Free CodeAi";
+            document.getElementById('authToggleText').textContent = isRegisterMode ? "Already have an account? Sign In" : "Create an account";
+        }
+
+        async function handleAuth() {
+            const username = document.getElementById('authUser').value.trim();
+            const password = document.getElementById('authPass').value.trim();
+            if(!username || !password) return;
+
+            const endpoint = isRegisterMode ? '/api/auth/register' : '/api/auth/login';
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+            if (data.error) return alert(data.error);
+
+            if (isRegisterMode) {
+                isRegisterMode = false; handleAuth();
+            } else {
+                localStorage.setItem('username', data.username);
+                window.location.reload();
+            }
+        }
+
+        function toggleRecentsMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('recentsMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', () => {
+            document.getElementById('recentsMenu').classList.add('hidden');
+        });
+
+        function fillPrompt(text) {
+            document.getElementById('promptInput').value = text;
+            document.getElementById('promptInput').focus();
+        }
+
+        async function loadHistory() {
+            const res = await fetch('/api/chats', { headers: { 'x-user-session': currentUser } });
+            const data = await res.json();
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+            data.chats.reverse().forEach(chat => {
+                const item = document.createElement('div');
+                item.className = 'popup-item';
+                item.textContent = chat.prompt;
+                item.onclick = () => {
+                    showSavedChat(chat.prompt, chat.result);
+                };
+                list.appendChild(item);
+            });
+        }
+
+        function showSavedChat(prompt, code) {
+            document.getElementById('welcomeMessage').style.display = 'none';
+            document.getElementById('conversationFlow').classList.remove('hidden');
+            document.getElementById('userMsgDisplay').textContent = prompt;
+            document.getElementById('outputDisplay').textContent = code;
+        }
+
+        function startNewChat() {
+            document.getElementById('welcomeMessage').style.display = 'flex';
+            document.getElementById('conversationFlow').classList.add('hidden');
+            document.getElementById('promptInput').value = '';
+        }
+
+        async function generateCode() {
+            const prompt = document.getElementById('promptInput').value;
+            const outputDisplay = document.getElementById('outputDisplay');
+            const userMsgDisplay = document.getElementById('userMsgDisplay');
+            const flow = document.getElementById('conversationFlow');
+            const welcome = document.getElementById('welcomeMessage');
+            const btn = document.getElementById('generateBtn');
+
+            if (!prompt.trim()) return;
+
+            welcome.style.display = 'none';
+            flow.classList.remove('hidden');
+            userMsgDisplay.textContent = prompt;
+            outputDisplay.textContent = "Thinking...";
+            document.getElementById('promptInput').value = '';
+
+            try {
+                const response = await fetch('/api/generate-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-user-session': currentUser },
+                    body: JSON.stringify({ prompt })
+                });
+                const data = await response.json();
+                outputDisplay.textContent = data.result || data.error;
+                loadHistory();
+            } catch {
+                outputDisplay.textContent = "Error communicating with endpoint.";
+            }
+        }
+
+        function logout() { localStorage.clear(); window.location.reload(); }
+        function copyToClipboard() { navigator.clipboard.writeText(document.getElementById('outputDisplay').textContent); }
+    </script>
+</body>
+</html>
